@@ -152,10 +152,10 @@ function createResultElements(suggestion, data) {
     plantInfo.className = 'plant-info';
     resultDiv.appendChild(plantInfo);
 
-    addInfoLine(plantInfo, '🔬 Wetenschappelijke naam', suggestion.name || 'Onbekend');
+    addInfoLine(plantInfo, ' Wetenschappelijke naam', suggestion.name || 'Onbekend');
 
     const probability = suggestion.probability || 0;
-    addInfoLine(plantInfo, '🎯 Nauwkeurigheid', Math.round(probability * 100) + '%');
+    addInfoLine(plantInfo, ' Nauwkeurigheid', Math.round(probability * 100) + '%');
 
     let commonNames = 'Onbekend';
     if (suggestion.details && suggestion.details.common_names) {
@@ -165,12 +165,12 @@ function createResultElements(suggestion, data) {
 
     if (data.result.disease && data.result.disease.suggestions && data.result.disease.suggestions.length > 0) {
         const disease = data.result.disease.suggestions[0];
-        addInfoLine(plantInfo, '🌱 Gezondheid', (disease.name || 'Onbekend') + ' (' + Math.round((disease.probability || 0) * 100) + '%)');
+        addInfoLine(plantInfo, ' Gezondheid', (disease.name || 'Onbekend') + ' (' + Math.round((disease.probability || 0) * 100) + '%)');
     }
 
     if (suggestion.details && suggestion.details.description && suggestion.details.description.value) {
         const description = document.createElement('p');
-        description.innerHTML = '<strong>📖 Beschrijving:</strong><br>' + suggestion.details.description.value.substring(0, 250) + '...';
+        description.innerHTML = '<strong> Beschrijving:</strong><br>' + suggestion.details.description.value.substring(0, 250) + '...';
         plantInfo.appendChild(description);
     }
 
@@ -179,7 +179,7 @@ function createResultElements(suggestion, data) {
         similarContainer.className = 'similar-images';
 
         const similarTitle = document.createElement('p');
-        similarTitle.innerHTML = '<strong>🔍 Vergelijkbare afbeeldingen:</strong>';
+        similarTitle.innerHTML = '<strong> Vergelijkbare afbeeldingen:</strong>';
         similarContainer.appendChild(similarTitle);
 
         suggestion.similar_images.slice(0, 5).forEach(img => {
@@ -195,7 +195,7 @@ function createResultElements(suggestion, data) {
     }
 
     const newScanBtn = document.createElement('button');
-    newScanBtn.textContent = '🔄 Nieuwe scan';
+    newScanBtn.textContent = ' Nieuwe scan';
     newScanBtn.className = 'btn';
     newScanBtn.onclick = () => location.reload();
     resultDiv.appendChild(newScanBtn);
@@ -219,7 +219,7 @@ function showError(title, message) {
     errorDiv.className = 'error';
 
     const errorTitle = document.createElement('h3');
-    errorTitle.textContent = '❌ ' + title;
+    errorTitle.textContent = ' ' + title;
     errorDiv.appendChild(errorTitle);
 
     const errorMsg = document.createElement('p');
@@ -227,7 +227,7 @@ function showError(title, message) {
     errorDiv.appendChild(errorMsg);
 
     const retryBtn = document.createElement('button');
-    retryBtn.textContent = '🔄 Probeer opnieuw';
+    retryBtn.textContent = ' Probeer opnieuw';
     retryBtn.className = 'btn';
     retryBtn.onclick = () => location.reload();
     errorDiv.appendChild(retryBtn);
