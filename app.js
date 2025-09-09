@@ -25,7 +25,7 @@ async function startCamera() {
         video.srcObject = stream;
     } catch (err) {
         console.error('Fout bij toegang camera:', err);
-        showError('Camera Fout', 'Kon geen toegang krijgen tot de camera. Controleer uw toestemmingen en zorg dat u HTTPS gebruikt.');
+        alert('Kon geen toegang krijgen tot de camera. Controleer uw toestemmingen en zorg dat u HTTPS gebruikt.');
     }
 }
 
@@ -56,7 +56,7 @@ retakeBtn.addEventListener('click', function() {
     photoPreview.classList.add('hidden');
     resultDiv.classList.add('hidden');
     captureBtn.classList.remove('hidden');
-    clearResultDiv();
+    resultDiv.innerHTML = '';
     startCamera();
 });
 
@@ -71,7 +71,7 @@ sendBtn.addEventListener('click', async function() {
         canvas.toBlob(async function(blob) {
             try {
                 // Controleer of API key is ingesteld
-                if (!PLANT_ID_API_KEY || PLANT_ID_API_KEY === 'Tzjm3d6QtmenotzI7SZjpPyrZUXm41gZF1xuc1ixBKEc6qk1gK') {
+                if (!PLANT_ID_API_KEY || PLANT_ID_API_KEY === 'JOUW_API_KEY_HIER') {
                     throw new Error('API key niet ingesteld. Vul je Plant.id API key in config.js in.');
                 }
 
@@ -81,14 +81,15 @@ sendBtn.addEventListener('click', async function() {
                 // Verwijder data:image/jpeg;base64, prefix
                 const base64Data = base64Image.split(',')[1];
 
-
+                // Maak request data volgens Plant.id API specificatie
                 const requestData = {
                     images: [base64Data],
                     similar_images: true,
-                    health: 'all'
+                    health: 'all',
+                    language: 'nl'
                 };
 
-                console.log('Sending request to Plant.id API...', requestData);
+                console.log('Sending request to Plant.id API...');
 
                 // Verstuur direct naar Plant.id API
                 const response = await fetch(PLANT_ID_API_URL, {
@@ -106,13 +107,13 @@ sendBtn.addEventListener('click', async function() {
                 }
 
                 const data = await response.json();
-                console.log('API response received', data);
+                console.log('API response received');
 
                 loadingDiv.classList.add('hidden');
                 resultDiv.classList.remove('hidden');
                 sendBtn.disabled = false;
 
-                // Verwerk de response met DOM manipulatie
+                // Verwerk de response
                 processApiResponse(data);
 
             } catch (error) {
@@ -139,18 +140,64 @@ function blobToBase64(blob) {
     });
 }
 
-// Verwerk API response met DOM manipulatie
+// Verwerk API response
 function processApiResponse(data) {
-    clearResultDiv();
-
     if (data.result && data.result.classification && data.result.classification.suggestions) {
         const suggestions = data.result.classification.suggestions;
 
         if (suggestions.length > 0) {
             const suggestion = suggestions[0];
 
-            // Creëer resultaat elementen met DOM manipulatie
-            createResultElements(suggestion, data);
+            const plantName = suggestion.name || 'Onbekend';
+            const probability = suggestion.probability || 0;
+
+            let commonNames = 'Onbekend';
+            if (suggestion.details && suggestion.details.common_names) {
+                commonNames = suggestion.details.common_names.join(', ');
+            }
+
+            let wikiDescription = '';
+            if (suggestion.details && suggestion.details.description && suggestion.details.description.value) {
+                wikiDescription = suggestion.details.description.value;
+            }
+
+            // Toon similar images indien beschikbaar
+            let similarImagesHtml = '';
+            if (suggestion.similar_images && suggestion.similar_images.length > 0) {
+                similarImagesHtml = `
+                    <div class="similar-images">
+                        <p><strong>🔍 Vergelijkbare afbeeldingen:</strong></p>
+                        ${suggestion.similar_images.slice(0, 5).map(img => `
+                            <img src="${img.url}" class="similar-image" 
+                                 title="${img.citation || 'Similar image'}" 
+                                 onclick="window.open('${img.url}', '_blank')">
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            // Toon gezondheidsinfo indien beschikbaar
+            let healthHtml = '';
+            if (data.result.disease && data.result.disease.suggestions && data.result.disease.suggestions.length > 0) {
+                const disease = data.result.disease.suggestions[0];
+                healthHtml = `<p><strong>🌱 Gezondheid:</strong> ${disease.name || 'Onbekend'} (${Math.round((disease.probability || 0) * 100)}%)</p>`;
+            }
+
+            resultDiv.innerHTML = `
+                <h2>🌿 Scan Resultaat</h2>
+                <div class="plant-info">
+                    <p><strong>🔬 Wetenschappelijke naam:</strong> ${plantName}</p>
+                    <p><strong>🎯 Nauwkeurigheid:</strong> ${Math.round(probability * 100)}%</p>
+                    <p><strong>🇳🇱 Nederlandse naam:</strong> ${commonNames}</p>
+                    ${healthHtml}
+                    ${wikiDescription ? `
+                        <p><strong>📖 Beschrijving:</strong><br>
+                        ${wikiDescription.substring(0, 250)}...</p>
+                    ` : ''}
+                    ${similarImagesHtml}
+                </div>
+                <button onclick="location.reload()" class="btn">🔄 Nieuwe scan</button>
+            `;
         } else {
             throw new Error('Geen plant herkend in de foto');
         }
@@ -159,129 +206,28 @@ function processApiResponse(data) {
     }
 }
 
-// Creëer resultaat elementen met DOM manipulatie
-function createResultElements(suggestion, data) {
-    // Hoofd titel
-    const title = document.createElement('h2');
-    title.textContent = ' Scan Resultaat';
-    resultDiv.appendChild(title);
-
-    // Plant info container
-    const plantInfo = document.createElement('div');
-    plantInfo.className = 'plant-info';
-    resultDiv.appendChild(plantInfo);
-
-    // Wetenschappelijke naam
-    const scientificName = document.createElement('p');
-    scientificName.innerHTML = '<strong> Wetenschappelijke naam:</strong> ' + (suggestion.name || 'Onbekend');
-    plantInfo.appendChild(scientificName);
-
-    // Nauwkeurigheid
-    const accuracy = document.createElement('p');
-    const probability = suggestion.probability || 0;
-    accuracy.innerHTML = '<strong> Nauwkeurigheid:</strong> ' + Math.round(probability * 100) + '%';
-    plantInfo.appendChild(accuracy);
-
-    // Nederlandse naam
-    const commonNames = document.createElement('p');
-    let commonNamesText = 'Onbekend';
-    if (suggestion.details && suggestion.details.common_names) {
-        commonNamesText = suggestion.details.common_names.join(', ');
-    }
-    commonNames.innerHTML = '<strong>🇳🇱 Nederlandse naam:</strong> ' + commonNamesText;
-    plantInfo.appendChild(commonNames);
-
-    // Gezondheidsinfo
-    if (data.result.disease && data.result.disease.suggestions && data.result.disease.suggestions.length > 0) {
-        const disease = data.result.disease.suggestions[0];
-        const health = document.createElement('p');
-        health.innerHTML = '<strong> Gezondheid:</strong> ' + (disease.name || 'Onbekend') + ' (' + Math.round((disease.probability || 0) * 100) + '%)';
-        plantInfo.appendChild(health);
-    }
-
-    // Beschrijving
-    if (suggestion.details && suggestion.details.description && suggestion.details.description.value) {
-        const description = document.createElement('p');
-        const descText = suggestion.details.description.value.substring(0, 250) + '...';
-        description.innerHTML = '<strong> Beschrijving:</strong><br>' + descText;
-        plantInfo.appendChild(description);
-    }
-
-    // Vergelijkbare afbeeldingen
-    if (suggestion.similar_images && suggestion.similar_images.length > 0) {
-        const similarContainer = document.createElement('div');
-        similarContainer.className = 'similar-images';
-
-        const similarTitle = document.createElement('p');
-        similarTitle.innerHTML = '<strong> Vergelijkbare afbeeldingen:</strong>';
-        similarContainer.appendChild(similarTitle);
-
-        suggestion.similar_images.slice(0, 5).forEach(img => {
-            const imgElement = document.createElement('img');
-            imgElement.src = img.url;
-            imgElement.className = 'similar-image';
-            imgElement.title = img.citation || 'Similar image';
-            imgElement.onclick = () => window.open(img.url, '_blank');
-            similarContainer.appendChild(imgElement);
-        });
-
-        plantInfo.appendChild(similarContainer);
-    }
-
-    // Nieuwe scan knop
-    const newScanBtn = document.createElement('button');
-    newScanBtn.textContent = ' Nieuwe scan';
-    newScanBtn.className = 'btn';
-    newScanBtn.onclick = () => location.reload();
-    resultDiv.appendChild(newScanBtn);
-}
-
-// Toon error message met DOM manipulatie
+// Toon error message
 function showError(title, message) {
     loadingDiv.classList.add('hidden');
     resultDiv.classList.remove('hidden');
-
-    clearResultDiv();
-
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'error';
-
-    const errorTitle = document.createElement('h3');
-    errorTitle.textContent =  title;
-    errorDiv.appendChild(errorTitle);
-
-    const errorMsg = document.createElement('p');
-    errorMsg.textContent = message;
-    errorDiv.appendChild(errorMsg);
-
-    const errorHint = document.createElement('p');
-    errorHint.innerHTML = '<small>Controleer je API key en internet verbinding</small>';
-    errorDiv.appendChild(errorHint);
-
-    const retryBtn = document.createElement('button');
-    retryBtn.textContent = ' Probeer opnieuw';
-    retryBtn.className = 'btn';
-    retryBtn.onclick = () => location.reload();
-    errorDiv.appendChild(retryBtn);
-
-    resultDiv.appendChild(errorDiv);
-}
-
-// Leeg de result div
-function clearResultDiv() {
-    while (resultDiv.firstChild) {
-        resultDiv.removeChild(resultDiv.firstChild);
-    }
+    resultDiv.innerHTML = `
+        <div class="error">
+            <h3>❌ ${title}</h3>
+            <p>${message}</p>
+            <p><small>Controleer je API key en internet verbinding</small></p>
+            <button onclick="location.reload()" class="btn">🔄 Probeer opnieuw</button>
+        </div>
+    `;
 }
 
 // Start de camera wanneer de pagina laadt
 window.addEventListener('load', function() {
     if (window.location.protocol !== 'https:') {
-        showError('HTTPS Vereist', 'Deze website vereist HTTPS voor camera toegang. Gelieve te gebruiken via HTTPS.');
+        alert('⚠️ Deze website vereist HTTPS voor camera toegang. Gelieve te gebruiken via HTTPS.');
     }
 
-    if (!PLANT_ID_API_KEY || PLANT_ID_API_KEY === 'Tzjm3d6QtmenotzI7SZjpPyrZUXm41gZF1xuc1ixBKEc6qk1gK') {
-        showError('API Key Mist', 'Vergeet niet je Plant.id API key in config.js in te vullen!');
+    if (!PLANT_ID_API_KEY || PLANT_ID_API_KEY === 'JOUW_API_KEY_HIER') {
+        alert('⚠️ Vergeet niet je Plant.id API key in config.js in te vullen!');
     }
 
     startCamera();
