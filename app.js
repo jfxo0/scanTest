@@ -71,7 +71,7 @@ sendBtn.addEventListener('click', async function() {
         canvas.toBlob(async function(blob) {
             try {
                 // Controleer of API key is ingesteld
-                if (!PLANT_ID_API_KEY || PLANT_ID_API_KEY === 'JOUW_API_KEY_HIER') {
+                if (!PLANT_ID_API_KEY || PLANT_ID_API_KEY === 'Tzjm3d6QtmenotzI7SZjpPyrZUXm41gZF1xuc1ixBKEc6qk1gK') {
                     throw new Error('API key niet ingesteld. Vul je Plant.id API key in config.js in.');
                 }
 
@@ -81,7 +81,7 @@ sendBtn.addEventListener('click', async function() {
                 // Verwijder data:image/jpeg;base64, prefix
                 const base64Data = base64Image.split(',')[1];
 
-                // CORRECTIE: Gebruik alleen beschikbare modifiers volgens de error
+
                 const requestData = {
                     images: [base64Data],
                     similar_images: true,
@@ -280,7 +280,7 @@ window.addEventListener('load', function() {
         showError('HTTPS Vereist', 'Deze website vereist HTTPS voor camera toegang. Gelieve te gebruiken via HTTPS.');
     }
 
-    if (!PLANT_ID_API_KEY || PLANT_ID_API_KEY === 'JOUW_API_KEY_HIER') {
+    if (!PLANT_ID_API_KEY || PLANT_ID_API_KEY === 'Tzjm3d6QtmenotzI7SZjpPyrZUXm41gZF1xuc1ixBKEc6qk1gK') {
         showError('API Key Mist', 'Vergeet niet je Plant.id API key in config.js in te vullen!');
     }
 
