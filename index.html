@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Scanner - JavaScript</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="container">
+    <div class="camera-icon">🌿📷</div>
+    <h1>Plant Scanner - Direct JavaScript</h1>
+    <p>Neem een foto van een plant om deze te herkennen</p>
+
+    <!-- Camera view -->
+    <video id="cameraView" autoplay playsinline></video>
+    <br>
+
+    <!-- Capture button -->
+    <button id="captureBtn" class="btn">📷 Foto maken</button>
+
+    <!-- Canvas om foto vast te leggen (hidden) -->
+    <canvas id="photoCanvas" class="hidden"></canvas>
+
+    <!-- Preview van gemaakte foto -->
+    <div id="photoPreview" class="hidden">
+        <img id="previewImage" class="preview-img">
+        <br>
+        <button id="retakeBtn" class="btn btn-warning">🔄 Opnieuw proberen</button>
+        <button id="sendBtn" class="btn btn-secondary">🔍 Plant scannen</button>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="hidden loading">
+        ⏳ Plant aan het scannen...
+    </div>
+
+    <!-- Resultaat -->
+    <div id="result" class="hidden"></div>
+
+    <div class="api-info">
+        Directe API call naar Plant.id - Geen PHP server nodig
+    </div>
+</div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
