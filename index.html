@@ -1,10 +1,60 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="nl">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Plant Scanner - JavaScript</title>-->
+<!--    <link rel="stylesheet" href="styles.css">-->
+<!--</head>-->
+<!--<body>-->
+<!--<div class="container">-->
+<!--    <div class="camera-icon">🌿📷</div>-->
+<!--    <h1>Plant Scanner - Direct JavaScript</h1>-->
+<!--    <p>Neem een foto van een plant om deze te herkennen</p>-->
+
+<!--    &lt;!&ndash; Camera view &ndash;&gt;-->
+<!--    <video id="cameraView" autoplay playsinline></video>-->
+<!--    <br>-->
+
+<!--    &lt;!&ndash; Capture button &ndash;&gt;-->
+<!--    <button id="captureBtn" class="btn">📷</button>-->
+
+<!--    &lt;!&ndash; Canvas om foto vast te leggen (hidden) &ndash;&gt;-->
+<!--    <canvas id="photoCanvas" class="hidden"></canvas>-->
+
+<!--    &lt;!&ndash; Preview van gemaakte foto &ndash;&gt;-->
+<!--    <div id="photoPreview" class="hidden">-->
+<!--        <img id="previewImage" class="preview-img">-->
+<!--        <br>-->
+<!--        <button id="retakeBtn" class="btn btn-warning"> Opnieuw proberen</button>-->
+<!--        <button id="sendBtn" class="btn btn-secondary"> Plant scannen</button>-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; Loading &ndash;&gt;-->
+<!--    <div id="loading" class="hidden loading">-->
+<!--         Plant aan het scannen...-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; Resultaat &ndash;&gt;-->
+<!--    <div id="result" class="hidden"></div>-->
+
+<!--&lt;!&ndash;    <div class="api-info">&ndash;&gt;-->
+<!--&lt;!&ndash;        Directe API call naar Plant.id - Geen PHP server nodig&ndash;&gt;-->
+<!--&lt;!&ndash;    </div>&ndash;&gt;-->
+<!--</div>-->
+
+<!--<script src="config.js"></script>-->
+<!--<script src="app.js"></script>-->
+<!--</body>-->
+<!--</html>-->
+
 <!DOCTYPE html>
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plant Scanner - JavaScript</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../css/scan.css">
 </head>
 <body>
 <div class="container">
@@ -32,18 +82,25 @@
 
     <!-- Loading -->
     <div id="loading" class="hidden loading">
-         Plant aan het scannen...
+        Plant aan het scannen...
     </div>
 
     <!-- Resultaat -->
     <div id="result" class="hidden"></div>
 
-<!--    <div class="api-info">-->
-<!--        Directe API call naar Plant.id - Geen PHP server nodig-->
-<!--    </div>-->
+
 </div>
 
-<script src="config.js"></script>
+<footer>
+    <a href="index.html">Steps</a>
+    <a href="scan.html">Scan</a>
+    <a href="rewards.html">Rewards</a>
+    <a href="memories.php">Memories</a>
+    <a href="">Profile</a>
+</footer>
+
+<script src="../js/config.js"></script>
 <script src="app.js"></script>
+<script src="../js/rewards.js"></script>
 </body>
 </html>
